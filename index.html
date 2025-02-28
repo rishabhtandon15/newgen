@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chronic Disease Management Dashboard</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.21.2/babel.min.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      background-color: #f5f8fa;
+      color: #333;
+      line-height: 1.6;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    .app-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #e1e4e8;
+    }
+    
+    .app-title {
+      color: #2c3e50;
+      font-size: 24px;
+      font-weight: bold;
+    }
+    
+    .dashboard {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 20px;
+    }
+    
+    .sidebar {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      padding: 20px;
+    }
+    
+    .main-content {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    
+    .card {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .card-title {
+      font-size: 18px;
+      color: #2c3e50;
+      margin-bottom: 15px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+    }
+    
+    .card-title .icon {
+      margin-right: 10px;
+      background-color: #3498db;
+      color: white;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .nav-item {
+      padding: 12px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-bottom: 5px;
+      transition: background-color 0.2s;
+      display: flex;
+      align-items: center;
+    }
+    
+    .nav-item:hover {
+      background-color: #f0f2f5;
+    }
+    
+    .nav-item.active {
+      background-color: #e6f7ff;
+      color: #1890ff;
+      font-weight: 500;
+    }
+    
+    .nav-item .icon {
+      margin-right: 10px;
+    }
+    
+    .btn {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background-color 0.2s;
+    }
+    
+    .btn-primary {
+      background-color: #1890ff;
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background-color: #0c7cd5;
+    }
+    
+    .btn-secondary {
+      background-color: #f0f2f5;
+      color: #333;
+    }
+    
+    .btn-secondary:hover {
+      background-color: #e1e4e8;
+    }
+    
+    .profile {
+      display: flex;
+      align-items: center;
+    }
+    
+    .profile-image {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: #3498db;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 10px;
+      font-weight: bold;
+    }
+    
+    .profile-details h3 {
+      font-size: 16px;
+      margin-bottom: 2px;
+    }
+    
+    .profile-details p {
+      font-size: 14px;
+      color: #666;
+    }
+    
+    .statistic {
+      text-align: center;
+      padding: 15px;
+      border-radius: 8px;
+      background-color: #f8f9fa;
+      margin-bottom: 10px;
+    }
+    
+    .statistic h3 {
+      font-size: 24px;
+      margin-bottom: 5px;
+      color: #1890ff;
+    }
+    
+    .statistic p {
+      font-size: 14px;
+      color: #666;
+    }
+    
+    .chart-container {
+      height: 250px;
+      position: relative;
+    }
+    
+    .chart-placeholder {
+      width: 100%;
+      height: 100%;
+      background-color: #f8f9fa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #666;
+      border-radius: 4px;
+    }
+    
+    .medication-list {
+      list-style: none;
+    }
+    
+    .medication-item {
+      padding: 15px;
+      border-bottom: 1px solid #eaeaea;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .medication-name {
+      font-weight: 500;
+    }
+    
+    .medication-details {
+      color: #666;
+      font-size: 14px;
+    }
+    
+    .status {
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    
+    .status-active {
+      background-color: #e6f7ff;
+      color: #1890ff;
+    }
+    
+    .status-low {
+      background-color: #fff7e6;
+      color: #fa8c16;
+    }
+    
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 24px;
+    }
+    
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 24px;
+    }
+    
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    
+    input:checked + .toggle-slider {
+      background-color: #1890ff;
+    }
+    
+    input:checked + .toggle-slider:before {
+      transform: translateX(26px);
+    }
+    
+    .health-metrics {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+    }
+    
+    .metric-card {
+      padding: 15px;
+      background-color: #f8f9fa;
+      border-radius: 8px;
+    }
+    
+    .metric-value {
+      font-size: 20px;
+      font-weight: 600;
+      margin: 10px 0;
+    }
+    
+    .metric-trend {
+      display: flex;
+      align-items: center;
+      font-size: 14px;
+    }
+    
+    .trend-up {
+      color: #52c41a;
+    }
+    
+    .trend-down {
+      color: #f5222d;
+    }
+    
+    .appointments {
+      margin-top: 20px;
+    }
+    
+    .appointment-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px;
+      border-bottom: 1px solid #eaeaea;
+    }
+    
+    .appointment-date {
+      color: #666;
+      font-size: 14px;
+    }
+    
+    @media (max-width: 768px) {
+      .dashboard {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    // React Components
+    const { useState, useEffect } = React;
+
+    // Sample data for chronic diseases
+    const chronicDiseases = [
+      { id: 1, name: "Diabetes Type 2", status: "Managed" },
+      { id: 2, name: "Hypertension", status: "Active" },
+      { id: 3, name: "Asthma", status: "Controlled" }
+    ];
+
+    // Sample medication data
+    const medications = [
+      { id: 1, name: "Metformin", dosage: "500mg", frequency: "Twice daily", status: "Active", supplyLeft: 25 },
+      { id: 2, name: "Lisinopril", dosage: "10mg", frequency: "Once daily", status: "Active", supplyLeft: 15 },
+      { id: 3, name: "Albuterol", dosage: "90mcg", frequency: "As needed", status: "Active", supplyLeft: 8 }
+    ];
+
+    // Sample appointments
+    const appointments = [
+      { id: 1, doctor: "Dr. Johnson", specialty: "Endocrinologist", date: "Mar 5, 2025", time: "10:00 AM" },
+      { id: 2, doctor: "Dr. Smith", specialty: "Cardiologist", date: "Mar 15, 2025", time: "2:30 PM" },
+    ];
+
+    // Health metrics
+    const healthMetrics = [
+      { id: 1, name: "Blood Glucose", value: "120 mg/dL", trend: "down", change: "5%" },
+      { id: 2, name: "Blood Pressure", value: "128/82 mmHg", trend: "down", change: "3%" },
+      { id: 3, name: "Weight", value: "175 lbs", trend: "up", change: "1%" },
+      { id: 4, name: "Daily Steps", value: "7,850", trend: "up", change: "12%" }
+    ];
+
+    // Icons Component (simplified)
+    const Icon = ({ name }) => {
+      // Simple icon mapping
+      const icons = {
+        dashboard: "📊",
+        disease: "🏥",
+        medication: "💊",
+        appointment: "📅",
+        metrics: "📈",
+        settings: "⚙️",
+        profile: "👤",
+        up: "↑",
+        down: "↓",
+        alert: "⚠️"
+      };
+      
+      return <span>{icons[name] || "•"}</span>;
+    };
+
+    // Navigation Item Component
+    const NavItem = ({ icon, label, active, onClick }) => {
+      return (
+        <div className={`nav-item ${active ? 'active' : ''}`} onClick={onClick}>
+          <span className="icon"><Icon name={icon} /></span>
+          {label}
+        </div>
+      );
+    };
+
+    // Medication List Item Component
+    const MedicationItem = ({ medication }) => {
+      return (
+        <div className="medication-item">
+          <div>
+            <div className="medication-name">{medication.name}</div>
+            <div className="medication-details">{medication.dosage} - {medication.frequency}</div>
+          </div>
+          <div>
+            {medication.supplyLeft <= 10 ? (
+              <span className="status status-low">{medication.supplyLeft} days left</span>
+            ) : (
+              <span className="status status-active">{medication.supplyLeft} days left</span>
+            )}
+          </div>
+        </div>
+      );
+    };
+
+    // Health Metric Component
+    const HealthMetric = ({ metric }) => {
+      return (
+        <div className="metric-card">
+          <div>{metric.name}</div>
+          <div className="metric-value">{metric.value}</div>
+          <div className={`metric-trend trend-${metric.trend}`}>
+            <Icon name={metric.trend} /> {metric.change}
+          </div>
+        </div>
+      );
+    };
+
+    // Appointment Item Component
+    const AppointmentItem = ({ appointment }) => {
+      return (
+        <div className="appointment-item">
+          <div>
+            <div>{appointment.doctor}</div>
+            <div className="appointment-date">{appointment.specialty}</div>
+          </div>
+          <div>
+            <div>{appointment.date}</div>
+            <div className="appointment-date">{appointment.time}</div>
+          </div>
+        </div>
+      );
+    };
+
+    // Main Dashboard Component
+    const Dashboard = () => {
+      const [activeTab, setActiveTab] = useState('dashboard');
+      const [reminderEnabled, setReminderEnabled] = useState(true);
+      
+      return (
+        <div className="container">
+          <header className="app-header">
+            <div className="app-title">Chronic Care Manager</div>
+            <div className="profile">
+              <div className="profile-image">JD</div>
+              <div className="profile-details">
+                <h3>John Doe</h3>
+                <p>Patient ID: 12345</p>
+              </div>
+            </div>
+          </header>
+          
+          <div className="dashboard">
+            <div className="sidebar">
+              <NavItem icon="dashboard" label="Dashboard" active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} />
+              <NavItem icon="disease" label="My Conditions" active={activeTab === 'conditions'} onClick={() => setActiveTab('conditions')} />
+              <NavItem icon="medication" label="Medications" active={activeTab === 'medications'} onClick={() => setActiveTab('medications')} />
+              <NavItem icon="appointment" label="Appointments" active={activeTab === 'appointments'} onClick={() => setActiveTab('appointments')} />
+              <NavItem icon="metrics" label="Health Metrics" active={activeTab === 'metrics'} onClick={() => setActiveTab('metrics')} />
+              <NavItem icon="settings" label="Settings" active={activeTab === 'settings'} onClick={() => setActiveTab('settings')} />
+              
+              <div className="card" style={{ marginTop: '30px' }}>
+                <div className="card-title">
+                  <span className="icon"><Icon name="alert" /></span>
+                  Medication Reminders
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>Remind me to take medications</div>
+                  <label className="toggle-switch">
+                    <input 
+                      type="checkbox" 
+                      checked={reminderEnabled} 
+                      onChange={() => setReminderEnabled(!reminderEnabled)}
+                    />
+                    <span className="toggle-slider"></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+            
+            <div className="main-content">
+              {activeTab === 'dashboard' && (
+                <>
+                  <div className="card">
+                    <div className="card-title">
+                      <span className="icon"><Icon name="disease" /></span>
+                      Chronic Conditions Overview
+                    </div>
+                    <div className="health-metrics">
+                      {chronicDiseases.map(disease => (
+                        <div key={disease.id} className="statistic">
+                          <h3>{disease.name}</h3>
+                          <p>{disease.status}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div className="card">
+                    <div className="card-title">
+                      <span className="icon"><Icon name="metrics" /></span>
+                      Health Metrics
+                    </div>
+                    <div className="health-metrics">
+                      {healthMetrics.map(metric => (
+                        <HealthMetric key={metric.id} metric={metric} />
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div className="card">
+                    <div className="card-title">
+                      <span className="icon"><Icon name="medication" /></span>
+                      Medication Tracker
+                    </div>
+                    <div className="medication-list">
+                      {medications.map(medication => (
+                        <MedicationItem key={medication.id} medication={medication} />
+                      ))}
+                    </div>
+                    <div style={{ marginTop: '15px' }}>
+                      <button className="btn btn-primary">Refill Prescriptions</button>
+                    </div>
+                  </div>
+                  
+                  <div className="card">
+                    <div className="card-title">
+                      <span className="icon"><Icon name="appointment" /></span>
+                      Upcoming Appointments
+                    </div>
+                    <div>
+                      {appointments.map(appointment => (
+                        <AppointmentItem key={appointment.id} appointment={appointment} />
+                      ))}
+                    </div>
+                    <div style={{ marginTop: '15px' }}>
+                      <button className="btn btn-primary">Schedule New Appointment</button>
+                    </div>
+                  </div>
+                </>
+              )}
+              
+              {activeTab === 'medications' && (
+                <div className="card">
+                  <div className="card-title">
+                    <span className="icon"><Icon name="medication" /></span>
+                    My Medications
+                  </div>
+                  <div className="medication-list">
+                    {medications.map(medication => (
+                      <MedicationItem key={medication.id} medication={medication} />
+                    ))}
+                  </div>
+                  <div style={{ marginTop: '20px', display: 'flex', gap: '10px' }}>
+                    <button className="btn btn-primary">Add Medication</button>
+                    <button className="btn btn-secondary">Medication History</button>
+                  </div>
+                </div>
+              )}
+              
+              {activeTab === 'metrics' && (
+                <div className="card">
+                  <div className="card-title">
+                    <span className="icon"><Icon name="metrics" /></span>
+                    Health Metrics Tracking
+                  </div>
+                  <div className="health-metrics">
+                    {healthMetrics.map(metric => (
+                      <HealthMetric key={metric.id} metric={metric} />
+                    ))}
+                  </div>
+                  <div className="chart-container" style={{ marginTop: '20px' }}>
+                    <div className="chart-placeholder">
+                      Blood Glucose Trend (Last 30 Days)
+                    </div>
+                  </div>
+                  <div style={{ marginTop: '20px' }}>
+                    <button className="btn btn-primary">Log New Reading</button>
+                  </div>
+                </div>
+              )}
+              
+              {activeTab === 'appointments' && (
+                <div className="card">
+                  <div className="card-title">
+                    <span className="icon"><Icon name="appointment" /></span>
+                    Appointments
+                  </div>
+                  <div>
+                    {appointments.map(appointment => (
+                      <AppointmentItem key={appointment.id} appointment={appointment} />
+                    ))}
+                  </div>
+                  <div style={{ marginTop: '20px', display: 'flex', gap: '10px' }}>
+                    <button className="btn btn-primary">Schedule Appointment</button>
+                    <button className="btn btn-secondary">Appointment History</button>
+                  </div>
+                </div>
+              )}
+              
+              {activeTab === 'conditions' && (
+                <div className="card">
+                  <div className="card-title">
+                    <span className="icon"><Icon name="disease" /></span>
+                    My Chronic Conditions
+                  </div>
+                  {chronicDiseases.map(disease => (
+                    <div key={disease.id} className="card" style={{ marginBottom: '15px' }}>
+                      <h3>{disease.name}</h3>
+                      <p>Status: {disease.status}</p>
+                      <div style={{ marginTop: '10px' }}>
+                        <button className="btn btn-secondary">View Details</button>
+                      </div>
+                    </div>
+                  ))}
+                  <div style={{ marginTop: '20px' }}>
+                    <button className="btn btn-primary">Add Condition</button>
+                  </div>
+                </div>
+              )}
+              
+              {activeTab === 'settings' && (
+                <div className="card">
+                  <div className="card-title">
+                    <span className="icon"><Icon name="settings" /></span>
+                    Settings
+                  </div>
+                  <div style={{ marginBottom: '20px' }}>
+                    <h3>Notification Preferences</h3>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '10px' }}>
+                      <div>Medication Reminders</div>
+                      <label className="toggle-switch">
+                        <input 
+                          type="checkbox" 
+                          checked={reminderEnabled} 
+                          onChange={() => setReminderEnabled(!reminderEnabled)}
+                        />
+                        <span className="toggle-slider"></span>
+                      </label>
+                    </div>
+                  </div>
+                  <div style={{ marginBottom: '20px' }}>
+                    <h3>Account Settings</h3>
+                    <button className="btn btn-secondary" style={{ marginTop: '10px' }}>
+                      Edit Profile
+                    </button>
+                  </div>
+                  <div>
+                    <h3>Data Sharing</h3>
+                    <button className="btn btn-secondary" style={{ marginTop: '10px' }}>
+                      Manage Healthcare Providers
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    // Render the app
+    ReactDOM.render(<Dashboard />, document.getElementById('root'));
+  </script>
+</body>
+</html>
